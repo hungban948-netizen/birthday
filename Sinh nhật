@@ -1,17 +1,15 @@
 import time
 import random
-import os
-import sys
+import math
 from rich.console import Console
 from rich.text import Text
 from rich.panel import Panel
 from rich.align import Align
-from rich.live import Live
 from rich.table import Table
 from rich import box
 
 # ── Cấu hình ──────────────────────────────────────────
-TEN  = "Tên Bạn"   # 👈 Đổi tên tại đây
+TEN  = "vĩnh hưng"   # 👈 Đổi tên tại đây
 TUOI = 21
 NGAY = "11/06/2005"
 # ──────────────────────────────────────────────────────
@@ -20,126 +18,91 @@ console = Console()
 W = console.width or 80
 
 RAINBOW = ["#ff0080","#ff6bcb","#ff6600","#fbbf24","#00ff88","#00ffff","#a78bfa","#ff00ff"]
-SPARKS  = ["✦","✧","★","✶","✸","✹","❋","❊","✺","⚡","💥","🌟","✨","🎆","🎇"]
+SPARKS  = ["*",".","+","x","o","#","@","!","^","~"]
 
-def rainbow(text):
+def rainbow_text(text):
     t = Text()
     for i, ch in enumerate(text):
-        t.append(ch, style=RAINBOW[i % len(RAINBOW)])
+        t.append(ch, style=f"bold {RAINBOW[i % len(RAINBOW)]}")
     return t
 
-def glitch_text(text):
-    glitch_chars = "!@#$%^&*<>?/\\|~`"
-    result = ""
-    for ch in text:
-        if random.random() < 0.15 and ch != " ":
-            result += random.choice(glitch_chars)
-        else:
-            result += ch
-    return result
-
 def typing_rainbow(text, delay=0.03):
-    colors = RAINBOW * 10
     for i, ch in enumerate(text):
-        console.print(ch, style=f"bold {colors[i % len(colors)]}", end="")
+        console.print(ch, style=f"bold {RAINBOW[i % len(RAINBOW)]}", end="")
         time.sleep(delay)
     print()
 
-def firework_burst(x_center=None, rows=6):
-    if x_center is None:
-        x_center = W // 2
-    shapes = []
-    for r in range(rows):
-        line = [" "] * W
-        n = r * 4 + 4
-        for _ in range(n):
-            angle_idx = random.randint(0, 359)
-            import math
-            rad = math.radians(angle_idx)
-            px = int(x_center + r * 2.5 * math.cos(rad))
-            py_off = int(r * 1.2 * math.sin(rad))
-            if 0 <= px < W:
-                line[px] = random.choice(SPARKS)
-        shapes.append(("".join(line), r))
-    return shapes
-
-def show_firework():
-    cx = W // 2
-    for step in range(8):
-        t = Text()
-        import math
-        for _ in range(3):
-            line = [" "] * min(W, 120)
-            n = step * 6 + 6
-            for _ in range(n):
-                angle = random.uniform(0, math.pi * 2)
-                dist = step * 2.5
-                px = int(cx + dist * math.cos(angle))
-                if 0 <= px < len(line):
-                    line[px] = random.choice(SPARKS)
-            color = RAINBOW[step % len(RAINBOW)]
-            t.append("".join(line) + "\n", style=f"bold {color}")
-        console.print(Align.center(t))
-        time.sleep(0.05)
-
-def ascii_heart():
-    heart = [
-        "  ██████   ██████  ",
-        " ████████ ████████ ",
-        " █████████████████ ",
-        "  ███████████████  ",
-        "   █████████████   ",
-        "    ███████████    ",
-        "     █████████     ",
-        "      ███████      ",
-        "       █████       ",
-        "        ███        ",
-        "         █         ",
-    ]
-    for i, line in enumerate(heart):
-        color = RAINBOW[i % len(RAINBOW)]
-        console.print(Align.center(Text(line, style=f"bold {color}")))
-        time.sleep(0.06)
-
-def separator():
-    chars = "═╔╗╚╝║╠╣╦╩╬"
-    line = ""
-    for i in range(min(W, 80)):
-        line += random.choice("═─━")
-    t = Text()
-    for i, ch in enumerate(line):
-        t.append(ch, style=RAINBOW[i % len(RAINBOW)])
-    console.print(Align.center(t))
-
 def glitch_reveal(text, final_color="#ffffff"):
-    steps = 8
-    for step in range(steps):
+    for step in range(8):
         g = ""
         for ch in text:
-            if step < steps - 1 and random.random() < (1 - step/steps) and ch != " ":
+            if step < 7 and random.random() < (1 - step/7) and ch not in (" ","!","?"):
                 g += random.choice("!@#$%^&*<>/\\|~")
             else:
                 g += ch
-        color = RAINBOW[step % len(RAINBOW)]
-        console.print(f"\r  {g}", style=f"bold {color}", end="")
-        time.sleep(0.07)
+        console.print(f"\r  {g}", style=f"bold {RAINBOW[step % len(RAINBOW)]}", end="")
+        time.sleep(0.06)
     console.print(f"\r  {text}", style=f"bold {final_color}")
 
-def pulse_bar():
-    bars = "▁▂▃▄▅▆▇█▇▆▅▄▃▂▁"
-    for _ in range(3):
+def separator():
+    line = ""
+    for i in range(min(W, 80)):
+        line += random.choice("=-~*")
+    console.print(Align.center(rainbow_text(line)))
+
+def show_firework():
+    cx = min(W, 80) // 2
+    for step in range(7):
+        lines = [""] * 3
+        for li in range(3):
+            row = [" "] * min(W, 80)
+            n = step * 5 + 5
+            for _ in range(n):
+                angle = random.uniform(0, math.pi * 2)
+                dist = step * 2.2 + li
+                px = int(cx + dist * math.cos(angle))
+                if 0 <= px < len(row):
+                    row[px] = random.choice(SPARKS)
+            lines[li] = "".join(row)
         t = Text()
-        for i in range(min(W//2, 40)):
-            ch = random.choice(bars)
-            t.append(ch, style=RAINBOW[i % len(RAINBOW)])
-        console.print(Align.center(t), end="\r")
-        time.sleep(0.08)
+        for li, ln in enumerate(lines):
+            t.append(ln + "\n", style=f"bold {RAINBOW[(step+li) % len(RAINBOW)]}")
+        console.print(Align.center(t))
+        time.sleep(0.05)
+
+def pulse_bar():
+    bars = "v^-~=+"
+    t = Text()
+    for i in range(min(W//2, 40)):
+        t.append(random.choice(bars), style=f"bold {RAINBOW[i % len(RAINBOW)]}")
+    console.print(Align.center(t), end="\r")
+    time.sleep(0.08)
     console.print()
+
+def ascii_cake():
+    cake = [
+        "         ,d88b.d88b,         ",
+        "         88888888888          ",
+        "         `Y8888888Y'          ",
+        "           `Y888Y'            ",
+        "             `Y'              ",
+        "   _  _  _  _|_|_  _  _  _   ",
+        "  |*||*||*|| HBD ||*||*||*|  ",
+        "  |_||_||_||_____|_||_||_||  ",
+        " /===========================\\",
+        "|  HAPPY BIRTHDAY!! TUỔI 21  |",
+        "|_____________________________|",
+        " \\===========================/",
+    ]
+    for i, line in enumerate(cake):
+        color = RAINBOW[i % len(RAINBOW)]
+        console.print(Align.center(Text(line, style=f"bold {color}")))
+        time.sleep(0.08)
 
 def main():
     console.clear()
 
-    # ── Intro pháo hoa ──
+    # Intro pháo hoa
     for _ in range(3):
         show_firework()
 
@@ -147,98 +110,80 @@ def main():
     separator()
     console.print()
 
-    # ── Glitch reveal tên ──
-    console.print(Align.center(Text("⚡ LOADING BIRTHDAY... ⚡", style="bold #00ffff")))
-    time.sleep(0.3)
+    # Matrix binary intro
+    console.print(Align.center(Text(">> LOADING BIRTHDAY... <<", style="bold #00ffff")))
     console.print()
-
-    for _ in range(5):
+    for _ in range(4):
         line = ""
         for i in range(min(W, 60)):
             line += random.choice("01 ")
-        t = Text()
-        for i, ch in enumerate(line):
-            t.append(ch, style=RAINBOW[i % len(RAINBOW)])
-        console.print(Align.center(t))
+        console.print(Align.center(rainbow_text(line)))
         time.sleep(0.07)
 
     console.print()
 
-    # ── Tiêu đề glitch ──
-    title_text = f"🎉  CHÚC MỪNG SINH NHẬT  🎉"
-    glitch_reveal(title_text, "#ff6bcb")
+    # Glitch reveal
+    glitch_reveal(f">>> CHUC MUNG SINH NHAT! <<<", "#ff6bcb")
     time.sleep(0.2)
-
-    name_text = f"✨  {TEN}  ✨"
-    glitch_reveal(name_text, "#a78bfa")
+    glitch_reveal(f">>> {TEN} <<<", "#a78bfa")
     time.sleep(0.3)
 
     console.print()
     separator()
     console.print()
 
-    # ── Trái tim ASCII ──
-    ascii_heart()
+    # Bánh sinh nhật ASCII
+    ascii_cake()
     console.print()
 
-    # ── Pulse bar ──
+    # Pulse
     for _ in range(4):
         pulse_bar()
-
     console.print()
 
-    # ── Info panel ──
+    # Info table
     info = Table(box=box.DOUBLE_EDGE, show_header=False, border_style="#a78bfa", padding=(0,2))
     info.add_column(style="bold #fbbf24", justify="right")
     info.add_column(style="white")
-    info.add_row("🎂  Tuổi", f"{TUOI} tuổi")
-    info.add_row("📅  Sinh nhật", NGAY)
-    info.add_row("🌟  Hôm nay", "Ngày đặc biệt nhất năm!")
-    info.add_row("🔥  Slogan", "Tuổi 21 — Ngầu nhất vũ trụ!")
+    info.add_row("Tuoi",    f"{TUOI} tuoi")
+    info.add_row("Ngay SN", NGAY)
+    info.add_row("Hom nay", "Ngay dac biet nhat!")
+    info.add_row("Slogan",  "Tuoi 21 -- Ngau nhat!")
     console.print(Align.center(info))
 
     console.print()
     separator()
     console.print()
 
-    # ── Lời chúc typing rainbow ──
+    # Lời chúc
     wishes = [
-        "🌟  Chúc bạn luôn vui vẻ và hạnh phúc!",
-        "🚀  Tuổi 21 — tự do, trẻ trung, đầy tiềm năng!",
-        "💪  Chúc bạn thành công trên mọi con đường!",
-        "❤️   Mọi ước mơ đều thành hiện thực!",
-        "⚡  Ngầu nhất, xịn nhất, cháy nhất!",
+        "* Chuc ban luon vui ve va hanh phuc!",
+        "* Tuoi 21 -- tu do, tre trung, day tiem nang!",
+        "* Chuc ban thanh cong tren moi con duong!",
+        "* Moi uoc mo deu thanh hien thuc!",
+        "* Ngau nhat, xin nhat, chay nhat!",
     ]
     for wish in wishes:
         console.print("  ", end="")
-        typing_rainbow(wish, delay=0.025)
-        time.sleep(0.15)
+        typing_rainbow(wish, delay=0.022)
+        time.sleep(0.12)
 
     console.print()
     separator()
     console.print()
 
-    # ── Pháo hoa cuối ──
-    for _ in range(4):
+    # Pháo hoa cuối
+    for _ in range(3):
         show_firework()
 
     console.print()
 
-    # ── Kết ──
-    final = Text()
-    msg = "🎊  HAPPY BIRTHDAY  🎊"
-    for i, ch in enumerate(msg):
-        final.append(ch, style=f"bold {RAINBOW[i % len(RAINBOW)]}")
-    console.print(Align.center(final))
-    console.print()
-
-    # ── Countdown ──
-    console.print(Align.center(Text("Tuổi mới bắt đầu trong...", style="#888888")))
+    # Countdown
+    console.print(Align.center(Text("Tuoi moi bat dau trong...", style="#888888")))
     for i in range(3, 0, -1):
-        t = Text(str(i), style=f"bold {RAINBOW[i % len(RAINBOW)]}")
-        console.print(Align.center(t))
+        console.print(Align.center(Text(str(i), style=f"bold {RAINBOW[i % len(RAINBOW)]}")))
         time.sleep(0.8)
-    console.print(Align.center(Text("🔥  LET'S GOOO!  🔥", style="bold #fbbf24")))
+    console.print(Align.center(rainbow_text("*** HAPPY BIRTHDAY!! LET'S GOOO!! ***")))
     console.print()
 
 if __name__ == "__main__":
