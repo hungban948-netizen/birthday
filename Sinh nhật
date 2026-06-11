@@ -169,6 +169,20 @@ def main():
         time.sleep(0.12)
 
     console.print()
+
+    # Bài thơ sinh nhật
+    poem = [
+        "  Sinh nhật lại đến một lần,",
+        "  Chúc mình hạnh phúc muôn phần bình an.",
+        "  Tuổi mới rực rỡ huy hoàng,",
+        "  Việc gì cũng thuận, đường càng thêm vui. 🎂🎉",
+    ]
+    console.print()
+    for i, line in enumerate(poem):
+        console.print(line, style=f"bold italic {RAINBOW[i % len(RAINBOW)]}")
+        time.sleep(0.3)
+
+    console.print()
     separator()
     console.print()
 
