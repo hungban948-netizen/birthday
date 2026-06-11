@@ -1,95 +1,161 @@
-import time
-import random
-from rich.console import Console
-from rich.text import Text
-from rich.panel import Panel
-from rich.align import Align
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<title>Happy Birthday</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-# ── Cấu hình ──────────────────────────────────────────
-TEN  = "Tên Bạn"   # 👈 Đổi tên tại đây
-TUOI = 21
-NGAY = "11/06/2005"
-# ──────────────────────────────────────────────────────
+  body {
+    background: #000;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'Arial Black', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-console = Console()
+  #code-bg {
+    position: fixed;
+    inset: 0;
+    opacity: 0.18;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    color: #a78bfa;
+    line-height: 1.6;
+    padding: 20px;
+    white-space: pre-wrap;
+    word-break: break-all;
+    z-index: 0;
+    pointer-events: none;
+  }
 
-COLORS = ["#ff6bcb", "#a78bfa", "#fbbf24", "#34d399", "#60a5fa", "#f87171", "#fb923c"]
+  #overlay {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.85) 100%);
+    z-index: 1;
+  }
 
-def typing(text, color="#f0e6ff", delay=0.045):
-    for ch in text:
-        console.print(ch, style=color, end="")
-        time.sleep(delay)
-    print()
+  #stage {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+  }
 
-def random_color():
-    return random.choice(COLORS)
+  #big-text {
+    font-size: clamp(3rem, 12vw, 9rem);
+    font-weight: 900;
+    color: white;
+    text-shadow:
+      0 0 30px rgba(255,107,203,0.8),
+      0 0 60px rgba(167,139,250,0.5);
+    letter-spacing: 0.05em;
+    min-height: 1.2em;
+    line-height: 1.2;
+  }
 
-def firework_line():
-    sparks = ["✦", "✧", "★", "✶", "✸", "✹", "❋", "❊", "✺"]
-    line = ""
-    for _ in range(40):
-        line += random.choice(sparks) + " "
-    return line
+  #sub-text {
+    font-size: clamp(1rem, 3vw, 2rem);
+    color: #a78bfa;
+    margin-top: 1rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    min-height: 1.5em;
+    text-shadow: 0 0 20px rgba(167,139,250,0.8);
+  }
 
-def show_fireworks(rounds=3):
-    for _ in range(rounds):
-        color = random_color()
-        console.print(Align.center(firework_line()), style=color)
-        time.sleep(0.15)
+  .particle {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1;
+    animation: float linear infinite;
+  }
+  @keyframes float {
+    0%   { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: 1; }
+    100% { transform: translateY(-10vh) rotate(720deg); opacity: 0; }
+  }
 
-def cake():
-    layers = [
-        ("        🕯️  🕯️  🕯️        ", "#fbbf24"),
-        ("   ~~~~~~~~~~~~~~~~~~~   ", "#f9a8d4"),
-        ("  |  🎂 HAPPY BDAY 🎂 |  ", "#db2777"),
-        ("  |___________________|  ", "#db2777"),
-        ("   ===================   ", "#c2410c"),
-        ("  |                   |  ", "#c2410c"),
-        ("  |___________________|  ", "#c2410c"),
-    ]
-    for line, color in layers:
-        console.print(Align.center(line), style=color)
-        time.sleep(0.1)
+  .flash {
+    animation: flashAnim 0.3s ease-out;
+  }
+  @keyframes flashAnim {
+    0%   { opacity: 0; transform: scale(1.15); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+</style>
+</head>
+<body>
 
-def main():
-    console.clear()
-    show_fireworks(4)
-    console.print()
-    title = Text("🎉  CHÚC MỪNG SINH NHẬT!  🎉", style="bold #ff6bcb")
-    console.print(Align.center(title))
-    time.sleep(0.4)
-    name_text = Text(f"✨  {TEN}  ✨", style="bold #a78bfa")
-    console.print(Align.center(name_text))
-    time.sleep(0.3)
-    console.print()
-    cake()
-    console.print()
-    info_panel = Panel.fit(
-        f"[bold #fbbf24]🎂 Tuổi:[/] [white]{TUOI} tuổi[/]\n"
-        f"[bold #34d399]📅 Ngày sinh:[/] [white]{NGAY}[/]\n"
-        f"[bold #60a5fa]🌟 Hôm nay là ngày đặc biệt của bạn![/]",
-        title="[bold #ff6bcb]Thông Tin Sinh Nhật[/]",
-        border_style="#a78bfa",
-        padding=(1, 4),
-    )
-    console.print(Align.center(info_panel))
-    time.sleep(0.5)
-    console.print()
-    wishes = [
-        ("🌟 Chúc bạn luôn vui vẻ và hạnh phúc!", "#fbbf24"),
-        ("🚀 Tuổi 21 — tự do, trẻ trung và đầy tiềm năng!", "#a78bfa"),
-        ("💪 Chúc bạn thành công trên mọi con đường!", "#34d399"),
-        ("❤️  Mọi ước mơ của bạn đều thành hiện thực!", "#ff6bcb"),
-    ]
-    for wish, color in wishes:
-        console.print("  ", end="")
-        typing(wish, color=color, delay=0.04)
-        time.sleep(0.2)
-    console.print()
-    show_fireworks(4)
-    console.print()
-    console.print(Align.center(Text("🎊  Happy Birthday!  🎊", style="bold #fbbf24")))
-    console.print()
+<div id="code-bg"></div>
+<div id="overlay"></div>
 
-if __name__ == "__main__":
-    main()
+<div id="stage">
+  <div id="big-text"></div>
+  <div id="sub-text"></div>
+</div>
+
+<script>
+const lines = [
+  { big: "CHÚC",        sub: "Happy Birthday 🎂" },
+  { big: "MỪNG",        sub: "Happy Birthday 🎂" },
+  { big: "SINH",        sub: "Happy Birthday 🎂" },
+  { big: "NHẬT",        sub: "Happy Birthday 🎂" },
+  { big: "🎉",          sub: "11 · 06 · 2005" },
+  { big: "TRÒN",        sub: "Hôm nay là ngày đặc biệt" },
+  { big: "21",          sub: "Hôm nay là ngày đặc biệt" },
+  { big: "TUỔI",        sub: "Hôm nay là ngày đặc biệt" },
+  { big: "🎂",          sub: "Chúc mừng sinh nhật!" },
+  { big: "VUI",         sub: "Chúc bạn luôn..." },
+  { big: "VẺ",          sub: "Chúc bạn luôn..." },
+  { big: "HẠNH",        sub: "Mạnh khỏe & thành công" },
+  { big: "PHÚC",        sub: "Mạnh khỏe & thành công" },
+  { big: "🚀",          sub: "Tuổi 21 đầy tiềm năng!" },
+  { big: "HAPPY",       sub: "🎊 Happy Birthday! 🎊" },
+  { big: "BIRTHDAY",    sub: "🎊 Happy Birthday! 🎊" },
+  { big: "🎉🎂🎉",      sub: "11 · 06 · 2026" },
+];
+
+const codeLines = `import time\nimport random\nfrom rich.console import Console\nfrom rich.text import Text\n\nconsole = Console()\n\ndef birthday():\n    name = "Happy Birthday"\n    age = 21\n    date = "11/06/2005"\n    wishes = [\n        "Chúc mừng sinh nhật!",\n        "Tròn 21 tuổi!",\n        "Hạnh phúc mãi mãi!",\n    ]\n    for wish in wishes:\n        console.print(wish)\n        time.sleep(0.5)\n\nbirthday()\n`.repeat(30);
+document.getElementById('code-bg').textContent = codeLines;
+
+const colors = ['#ff6bcb','#a78bfa','#fbbf24','#34d399','#60a5fa'];
+for (let i = 0; i < 25; i++) {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  const size = Math.random() * 6 + 3;
+  p.style.cssText = `
+    width:${size}px; height:${size}px;
+    left:${Math.random()*100}%;
+    background:${colors[Math.floor(Math.random()*colors.length)]};
+    animation-duration:${(Math.random()*6+4).toFixed(1)}s;
+    animation-delay:-${(Math.random()*8).toFixed(1)}s;
+    opacity:0.7;
+  `;
+  document.body.appendChild(p);
+}
+
+const bigEl = document.getElementById('big-text');
+const subEl = document.getElementById('sub-text');
+let idx = 0;
+
+function showNext() {
+  const line = lines[idx % lines.length];
+  bigEl.textContent = line.big;
+  subEl.textContent = line.sub;
+  bigEl.classList.remove('flash');
+  void bigEl.offsetWidth;
+  bigEl.classList.add('flash');
+  idx++;
+}
+
+showNext();
+setInterval(showNext, 700);
+</script>
+</body>
+</html>
