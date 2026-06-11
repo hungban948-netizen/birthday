@@ -1,0 +1,95 @@
+import time
+import random
+from rich.console import Console
+from rich.text import Text
+from rich.panel import Panel
+from rich.align import Align
+
+# ── Cấu hình ──────────────────────────────────────────
+TEN  = "Tên Bạn"   # 👈 Đổi tên tại đây
+TUOI = 21
+NGAY = "11/06/2005"
+# ──────────────────────────────────────────────────────
+
+console = Console()
+
+COLORS = ["#ff6bcb", "#a78bfa", "#fbbf24", "#34d399", "#60a5fa", "#f87171", "#fb923c"]
+
+def typing(text, color="#f0e6ff", delay=0.045):
+    for ch in text:
+        console.print(ch, style=color, end="")
+        time.sleep(delay)
+    print()
+
+def random_color():
+    return random.choice(COLORS)
+
+def firework_line():
+    sparks = ["✦", "✧", "★", "✶", "✸", "✹", "❋", "❊", "✺"]
+    line = ""
+    for _ in range(40):
+        line += random.choice(sparks) + " "
+    return line
+
+def show_fireworks(rounds=3):
+    for _ in range(rounds):
+        color = random_color()
+        console.print(Align.center(firework_line()), style=color)
+        time.sleep(0.15)
+
+def cake():
+    layers = [
+        ("        🕯️  🕯️  🕯️        ", "#fbbf24"),
+        ("   ~~~~~~~~~~~~~~~~~~~   ", "#f9a8d4"),
+        ("  |  🎂 HAPPY BDAY 🎂 |  ", "#db2777"),
+        ("  |___________________|  ", "#db2777"),
+        ("   ===================   ", "#c2410c"),
+        ("  |                   |  ", "#c2410c"),
+        ("  |___________________|  ", "#c2410c"),
+    ]
+    for line, color in layers:
+        console.print(Align.center(line), style=color)
+        time.sleep(0.1)
+
+def main():
+    console.clear()
+    show_fireworks(4)
+    console.print()
+    title = Text("🎉  CHÚC MỪNG SINH NHẬT!  🎉", style="bold #ff6bcb")
+    console.print(Align.center(title))
+    time.sleep(0.4)
+    name_text = Text(f"✨  {TEN}  ✨", style="bold #a78bfa")
+    console.print(Align.center(name_text))
+    time.sleep(0.3)
+    console.print()
+    cake()
+    console.print()
+    info_panel = Panel.fit(
+        f"[bold #fbbf24]🎂 Tuổi:[/] [white]{TUOI} tuổi[/]\n"
+        f"[bold #34d399]📅 Ngày sinh:[/] [white]{NGAY}[/]\n"
+        f"[bold #60a5fa]🌟 Hôm nay là ngày đặc biệt của bạn![/]",
+        title="[bold #ff6bcb]Thông Tin Sinh Nhật[/]",
+        border_style="#a78bfa",
+        padding=(1, 4),
+    )
+    console.print(Align.center(info_panel))
+    time.sleep(0.5)
+    console.print()
+    wishes = [
+        ("🌟 Chúc bạn luôn vui vẻ và hạnh phúc!", "#fbbf24"),
+        ("🚀 Tuổi 21 — tự do, trẻ trung và đầy tiềm năng!", "#a78bfa"),
+        ("💪 Chúc bạn thành công trên mọi con đường!", "#34d399"),
+        ("❤️  Mọi ước mơ của bạn đều thành hiện thực!", "#ff6bcb"),
+    ]
+    for wish, color in wishes:
+        console.print("  ", end="")
+        typing(wish, color=color, delay=0.04)
+        time.sleep(0.2)
+    console.print()
+    show_fireworks(4)
+    console.print()
+    console.print(Align.center(Text("🎊  Happy Birthday!  🎊", style="bold #fbbf24")))
+    console.print()
+
+if __name__ == "__main__":
+    main()
