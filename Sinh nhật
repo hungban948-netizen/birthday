@@ -1,161 +1,245 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-<meta charset="UTF-8"/>
-<title>Happy Birthday</title>
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+import time
+import random
+import os
+import sys
+from rich.console import Console
+from rich.text import Text
+from rich.panel import Panel
+from rich.align import Align
+from rich.live import Live
+from rich.table import Table
+from rich import box
 
-  body {
-    background: #000;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-    font-family: 'Arial Black', sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+# ── Cấu hình ──────────────────────────────────────────
+TEN  = "Tên Bạn"   # 👈 Đổi tên tại đây
+TUOI = 21
+NGAY = "11/06/2005"
+# ──────────────────────────────────────────────────────
 
-  #code-bg {
-    position: fixed;
-    inset: 0;
-    opacity: 0.18;
-    font-family: 'Courier New', monospace;
-    font-size: 13px;
-    color: #a78bfa;
-    line-height: 1.6;
-    padding: 20px;
-    white-space: pre-wrap;
-    word-break: break-all;
-    z-index: 0;
-    pointer-events: none;
-  }
+console = Console()
+W = console.width or 80
 
-  #overlay {
-    position: fixed;
-    inset: 0;
-    background: radial-gradient(ellipse at center, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.85) 100%);
-    z-index: 1;
-  }
+RAINBOW = ["#ff0080","#ff6bcb","#ff6600","#fbbf24","#00ff88","#00ffff","#a78bfa","#ff00ff"]
+SPARKS  = ["✦","✧","★","✶","✸","✹","❋","❊","✺","⚡","💥","🌟","✨","🎆","🎇"]
 
-  #stage {
-    position: relative;
-    z-index: 2;
-    text-align: center;
-  }
+def rainbow(text):
+    t = Text()
+    for i, ch in enumerate(text):
+        t.append(ch, style=RAINBOW[i % len(RAINBOW)])
+    return t
 
-  #big-text {
-    font-size: clamp(3rem, 12vw, 9rem);
-    font-weight: 900;
-    color: white;
-    text-shadow:
-      0 0 30px rgba(255,107,203,0.8),
-      0 0 60px rgba(167,139,250,0.5);
-    letter-spacing: 0.05em;
-    min-height: 1.2em;
-    line-height: 1.2;
-  }
+def glitch_text(text):
+    glitch_chars = "!@#$%^&*<>?/\\|~`"
+    result = ""
+    for ch in text:
+        if random.random() < 0.15 and ch != " ":
+            result += random.choice(glitch_chars)
+        else:
+            result += ch
+    return result
 
-  #sub-text {
-    font-size: clamp(1rem, 3vw, 2rem);
-    color: #a78bfa;
-    margin-top: 1rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    min-height: 1.5em;
-    text-shadow: 0 0 20px rgba(167,139,250,0.8);
-  }
+def typing_rainbow(text, delay=0.03):
+    colors = RAINBOW * 10
+    for i, ch in enumerate(text):
+        console.print(ch, style=f"bold {colors[i % len(colors)]}", end="")
+        time.sleep(delay)
+    print()
 
-  .particle {
-    position: fixed;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 1;
-    animation: float linear infinite;
-  }
-  @keyframes float {
-    0%   { transform: translateY(110vh) rotate(0deg); opacity: 0; }
-    10%  { opacity: 1; }
-    90%  { opacity: 1; }
-    100% { transform: translateY(-10vh) rotate(720deg); opacity: 0; }
-  }
+def firework_burst(x_center=None, rows=6):
+    if x_center is None:
+        x_center = W // 2
+    shapes = []
+    for r in range(rows):
+        line = [" "] * W
+        n = r * 4 + 4
+        for _ in range(n):
+            angle_idx = random.randint(0, 359)
+            import math
+            rad = math.radians(angle_idx)
+            px = int(x_center + r * 2.5 * math.cos(rad))
+            py_off = int(r * 1.2 * math.sin(rad))
+            if 0 <= px < W:
+                line[px] = random.choice(SPARKS)
+        shapes.append(("".join(line), r))
+    return shapes
 
-  .flash {
-    animation: flashAnim 0.3s ease-out;
-  }
-  @keyframes flashAnim {
-    0%   { opacity: 0; transform: scale(1.15); }
-    100% { opacity: 1; transform: scale(1); }
-  }
-</style>
-</head>
-<body>
+def show_firework():
+    cx = W // 2
+    for step in range(8):
+        t = Text()
+        import math
+        for _ in range(3):
+            line = [" "] * min(W, 120)
+            n = step * 6 + 6
+            for _ in range(n):
+                angle = random.uniform(0, math.pi * 2)
+                dist = step * 2.5
+                px = int(cx + dist * math.cos(angle))
+                if 0 <= px < len(line):
+                    line[px] = random.choice(SPARKS)
+            color = RAINBOW[step % len(RAINBOW)]
+            t.append("".join(line) + "\n", style=f"bold {color}")
+        console.print(Align.center(t))
+        time.sleep(0.05)
 
-<div id="code-bg"></div>
-<div id="overlay"></div>
+def ascii_heart():
+    heart = [
+        "  ██████   ██████  ",
+        " ████████ ████████ ",
+        " █████████████████ ",
+        "  ███████████████  ",
+        "   █████████████   ",
+        "    ███████████    ",
+        "     █████████     ",
+        "      ███████      ",
+        "       █████       ",
+        "        ███        ",
+        "         █         ",
+    ]
+    for i, line in enumerate(heart):
+        color = RAINBOW[i % len(RAINBOW)]
+        console.print(Align.center(Text(line, style=f"bold {color}")))
+        time.sleep(0.06)
 
-<div id="stage">
-  <div id="big-text"></div>
-  <div id="sub-text"></div>
-</div>
+def separator():
+    chars = "═╔╗╚╝║╠╣╦╩╬"
+    line = ""
+    for i in range(min(W, 80)):
+        line += random.choice("═─━")
+    t = Text()
+    for i, ch in enumerate(line):
+        t.append(ch, style=RAINBOW[i % len(RAINBOW)])
+    console.print(Align.center(t))
 
-<script>
-const lines = [
-  { big: "CHÚC",        sub: "Happy Birthday 🎂" },
-  { big: "MỪNG",        sub: "Happy Birthday 🎂" },
-  { big: "SINH",        sub: "Happy Birthday 🎂" },
-  { big: "NHẬT",        sub: "Happy Birthday 🎂" },
-  { big: "🎉",          sub: "11 · 06 · 2005" },
-  { big: "TRÒN",        sub: "Hôm nay là ngày đặc biệt" },
-  { big: "21",          sub: "Hôm nay là ngày đặc biệt" },
-  { big: "TUỔI",        sub: "Hôm nay là ngày đặc biệt" },
-  { big: "🎂",          sub: "Chúc mừng sinh nhật!" },
-  { big: "VUI",         sub: "Chúc bạn luôn..." },
-  { big: "VẺ",          sub: "Chúc bạn luôn..." },
-  { big: "HẠNH",        sub: "Mạnh khỏe & thành công" },
-  { big: "PHÚC",        sub: "Mạnh khỏe & thành công" },
-  { big: "🚀",          sub: "Tuổi 21 đầy tiềm năng!" },
-  { big: "HAPPY",       sub: "🎊 Happy Birthday! 🎊" },
-  { big: "BIRTHDAY",    sub: "🎊 Happy Birthday! 🎊" },
-  { big: "🎉🎂🎉",      sub: "11 · 06 · 2026" },
-];
+def glitch_reveal(text, final_color="#ffffff"):
+    steps = 8
+    for step in range(steps):
+        g = ""
+        for ch in text:
+            if step < steps - 1 and random.random() < (1 - step/steps) and ch != " ":
+                g += random.choice("!@#$%^&*<>/\\|~")
+            else:
+                g += ch
+        color = RAINBOW[step % len(RAINBOW)]
+        console.print(f"\r  {g}", style=f"bold {color}", end="")
+        time.sleep(0.07)
+    console.print(f"\r  {text}", style=f"bold {final_color}")
 
-const codeLines = `import time\nimport random\nfrom rich.console import Console\nfrom rich.text import Text\n\nconsole = Console()\n\ndef birthday():\n    name = "Happy Birthday"\n    age = 21\n    date = "11/06/2005"\n    wishes = [\n        "Chúc mừng sinh nhật!",\n        "Tròn 21 tuổi!",\n        "Hạnh phúc mãi mãi!",\n    ]\n    for wish in wishes:\n        console.print(wish)\n        time.sleep(0.5)\n\nbirthday()\n`.repeat(30);
-document.getElementById('code-bg').textContent = codeLines;
+def pulse_bar():
+    bars = "▁▂▃▄▅▆▇█▇▆▅▄▃▂▁"
+    for _ in range(3):
+        t = Text()
+        for i in range(min(W//2, 40)):
+            ch = random.choice(bars)
+            t.append(ch, style=RAINBOW[i % len(RAINBOW)])
+        console.print(Align.center(t), end="\r")
+        time.sleep(0.08)
+    console.print()
 
-const colors = ['#ff6bcb','#a78bfa','#fbbf24','#34d399','#60a5fa'];
-for (let i = 0; i < 25; i++) {
-  const p = document.createElement('div');
-  p.className = 'particle';
-  const size = Math.random() * 6 + 3;
-  p.style.cssText = `
-    width:${size}px; height:${size}px;
-    left:${Math.random()*100}%;
-    background:${colors[Math.floor(Math.random()*colors.length)]};
-    animation-duration:${(Math.random()*6+4).toFixed(1)}s;
-    animation-delay:-${(Math.random()*8).toFixed(1)}s;
-    opacity:0.7;
-  `;
-  document.body.appendChild(p);
-}
+def main():
+    console.clear()
 
-const bigEl = document.getElementById('big-text');
-const subEl = document.getElementById('sub-text');
-let idx = 0;
+    # ── Intro pháo hoa ──
+    for _ in range(3):
+        show_firework()
 
-function showNext() {
-  const line = lines[idx % lines.length];
-  bigEl.textContent = line.big;
-  subEl.textContent = line.sub;
-  bigEl.classList.remove('flash');
-  void bigEl.offsetWidth;
-  bigEl.classList.add('flash');
-  idx++;
-}
+    console.print()
+    separator()
+    console.print()
 
-showNext();
-setInterval(showNext, 700);
-</script>
-</body>
-</html>
+    # ── Glitch reveal tên ──
+    console.print(Align.center(Text("⚡ LOADING BIRTHDAY... ⚡", style="bold #00ffff")))
+    time.sleep(0.3)
+    console.print()
+
+    for _ in range(5):
+        line = ""
+        for i in range(min(W, 60)):
+            line += random.choice("01 ")
+        t = Text()
+        for i, ch in enumerate(line):
+            t.append(ch, style=RAINBOW[i % len(RAINBOW)])
+        console.print(Align.center(t))
+        time.sleep(0.07)
+
+    console.print()
+
+    # ── Tiêu đề glitch ──
+    title_text = f"🎉  CHÚC MỪNG SINH NHẬT  🎉"
+    glitch_reveal(title_text, "#ff6bcb")
+    time.sleep(0.2)
+
+    name_text = f"✨  {TEN}  ✨"
+    glitch_reveal(name_text, "#a78bfa")
+    time.sleep(0.3)
+
+    console.print()
+    separator()
+    console.print()
+
+    # ── Trái tim ASCII ──
+    ascii_heart()
+    console.print()
+
+    # ── Pulse bar ──
+    for _ in range(4):
+        pulse_bar()
+
+    console.print()
+
+    # ── Info panel ──
+    info = Table(box=box.DOUBLE_EDGE, show_header=False, border_style="#a78bfa", padding=(0,2))
+    info.add_column(style="bold #fbbf24", justify="right")
+    info.add_column(style="white")
+    info.add_row("🎂  Tuổi", f"{TUOI} tuổi")
+    info.add_row("📅  Sinh nhật", NGAY)
+    info.add_row("🌟  Hôm nay", "Ngày đặc biệt nhất năm!")
+    info.add_row("🔥  Slogan", "Tuổi 21 — Ngầu nhất vũ trụ!")
+    console.print(Align.center(info))
+
+    console.print()
+    separator()
+    console.print()
+
+    # ── Lời chúc typing rainbow ──
+    wishes = [
+        "🌟  Chúc bạn luôn vui vẻ và hạnh phúc!",
+        "🚀  Tuổi 21 — tự do, trẻ trung, đầy tiềm năng!",
+        "💪  Chúc bạn thành công trên mọi con đường!",
+        "❤️   Mọi ước mơ đều thành hiện thực!",
+        "⚡  Ngầu nhất, xịn nhất, cháy nhất!",
+    ]
+    for wish in wishes:
+        console.print("  ", end="")
+        typing_rainbow(wish, delay=0.025)
+        time.sleep(0.15)
+
+    console.print()
+    separator()
+    console.print()
+
+    # ── Pháo hoa cuối ──
+    for _ in range(4):
+        show_firework()
+
+    console.print()
+
+    # ── Kết ──
+    final = Text()
+    msg = "🎊  HAPPY BIRTHDAY  🎊"
+    for i, ch in enumerate(msg):
+        final.append(ch, style=f"bold {RAINBOW[i % len(RAINBOW)]}")
+    console.print(Align.center(final))
+    console.print()
+
+    # ── Countdown ──
+    console.print(Align.center(Text("Tuổi mới bắt đầu trong...", style="#888888")))
+    for i in range(3, 0, -1):
+        t = Text(str(i), style=f"bold {RAINBOW[i % len(RAINBOW)]}")
+        console.print(Align.center(t))
+        time.sleep(0.8)
+    console.print(Align.center(Text("🔥  LET'S GOOO!  🔥", style="bold #fbbf24")))
+    console.print()
+
+if __name__ == "__main__":
+    main()
